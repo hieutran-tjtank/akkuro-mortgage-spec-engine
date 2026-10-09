@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akkuro Mortgage Platform — Living Specification & Domain Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111726;
+      --card-border: #1e293b;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #10b981;
+      --accent-warn: #f59e0b;
+      --accent-danger: #ef4444;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+    }
+    header.site-header {
+      background: #0d121f;
+      border-bottom: 1px solid var(--card-border);
+      padding: 24px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-group h1 {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .logo-group p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .tab-bar {
+      display: flex;
+      gap: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tab-btn:hover {
+      color: #fff;
+      border-color: #334155;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .main-container {
+      max-width: 1280px;
+      margin: 32px auto;
+      padding: 0 24px;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .badge-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .badge.green {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.3);
+    }
+    .badge.rule {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .doc-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 32px;
+    }
+    @media (max-width: 960px) {
+      .doc-layout { grid-template-columns: 1fr; }
+      .toc-sidebar { display: none; }
+    }
+    .toc-sidebar {
+      position: sticky;
+      top: 100px;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .toc-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 110px;
+    }
+    .toc-list {
+      list-style: none;
+    }
+    .toc-list li {
+      margin-bottom: 6px;
+    }
+    .toc-list a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 13px;
+      display: block;
+      padding: 5px 10px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+      border-left: 3px solid transparent;
+    }
+    .toc-list a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .toc-list a.active {
+      color: #60a5fa !important;
+      background: rgba(59, 130, 246, 0.18) !important;
+      font-weight: 700;
+      border-left: 3px solid var(--primary) !important;
+      padding-left: 10px;
+    }
+    .toc-list a.sub {
+      padding-left: 18px;
+      font-size: 12px;
+      color: var(--text-muted);
+      border-left: 3px solid transparent;
+    }
+    .toc-list a.sub.active {
+      padding-left: 20px;
+      color: #93c5fd !important;
+      background: rgba(59, 130, 246, 0.12) !important;
+      border-left: 3px solid var(--primary) !important;
+      font-weight: 600;
+    }
+    .doc-content {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 40px;
+    }
+    h2.chapter-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-top: 36px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    h2.chapter-title:first-child {
+      margin-top: 0;
+    }
+    h3.section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #93c5fd;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+    h4.story-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 20px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    p {
+      margin-bottom: 14px;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 13px;
+    }
+    th {
+      text-align: left;
+      padding: 10px 12px;
+      background: #0d121f;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--card-border);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #1a2234;
+      color: #e2e8f0;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    pre {
+      background: #090d16;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #a5f3fc;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .user-story-card {
+      background: #0d121f;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .user-story-narrative {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      border-left: 2px solid var(--primary);
+      padding-left: 12px;
+    }
+    .user-story-narrative strong {
+      color: #f1f5f9;
+    }
+    /* Simulator Styles */
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 768px) {
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    input, select {
+      width: 100%;
+      background: #0d121f;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: var(--font);
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .checkbox-group input {
+      width: 16px;
+      height: 16px;
+    }
+    .checkbox-group label {
+      margin-bottom: 0;
+      text-transform: none;
+      color: var(--text);
+      font-size: 13px;
+    }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #1a2234;
+      font-size: 14px;
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-label {
+      color: var(--text-muted);
+    }
+    .result-value {
+      font-family: var(--font-mono);
+      font-weight: 600;
+      color: #fff;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .status-pill.pass {
+      background: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+    .status-pill.fail {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .rule-box {
+      margin-top: 20px;
+      padding: 14px;
+      background: rgba(59, 130, 246, 0.08);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: #93c5fd;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <h1>Akkuro Mortgage Platform</h1>
+        <p>Loan Origination System (LOS) — Independent Domain Research &amp; Living Specification</p>
+      </div>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('fsd-tab', this)">📋 Living FSD Specification</button>
+        <button class="tab-btn" onclick="switchTab('sim-tab', this)">🧮 Interactive Rule Simulator</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+
+    <!-- Tab 1: Living FSD Specification -->
+    <div id="fsd-tab" class="tab-content active">
+      <div class="badge-bar">
+        <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35);">🔍 Independent Domain Research (Public Sources)</span>
+        <span class="badge">Topicus Vietnam Showcase</span>
+        <span class="badge green">AFM / Nibud / NHG Statutory Compliance</span>
+        <span class="badge">Agile Living Docs</span>
+      </div>
+
+      <div class="doc-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="toc-sidebar">
+          <div class="toc-title">FSD Table of Contents</div>
+          <ul class="toc-list">
+            <li><a href="#ch1">1. Business Domain</a></li>
+            <li><a class="sub" href="#ch1-market">1.1 Market Context</a></li>
+            <li><a class="sub" href="#ch1-reg">1.2 Statutory Framework</a></li>
+            <li><a class="sub" href="#ch1-personas">1.3 Personas & Needs</a></li>
+            <li><a class="sub" href="#ch1-glossary">1.4 Domain Glossary</a></li>
+            <li><a href="#ch2">2. Process Architecture</a></li>
+            <li><a class="sub" href="#ch2-sequence">2.1 Sequence Flow</a></li>
+            <li><a class="sub" href="#ch2-bpmn">2.2 BPMN 5-Stage Swimlanes</a></li>
+            <li><a class="sub" href="#ch2-state">2.3 State Machine</a></li>
+            <li><a class="sub" href="#ch2-rbac">2.4 RBAC Matrix</a></li>
+            <li><a href="#ch3">3. Functional Epics (5 Stages)</a></li>
+            <li><a class="sub" href="#epic1">EPIC-01: Scenario Modeling</a></li>
+            <li><a class="sub" href="#epic2">EPIC-02: Dossier Intake</a></li>
+            <li><a class="sub" href="#epic3">EPIC-03: Credit Assessment</a></li>
+            <li><a class="sub" href="#epic4">EPIC-04: Binding Offer</a></li>
+            <li><a class="sub" href="#epic5">EPIC-05: Notary Closing</a></li>
+            <li><a href="#ch4">4. Data Architecture</a></li>
+            <li><a class="sub" href="#ch4-erd">4.1 Conceptual ERD</a></li>
+            <li><a class="sub" href="#ch4-dictionary">4.2 Data Dictionary (6 Entities)</a></li>
+            <li><a href="#ch5">5. Business Rules Matrix</a></li>
+            <li><a class="sub" href="#ch5-ltv">5.1 LTV Decision Table</a></li>
+            <li><a class="sub" href="#ch5-nhg">5.2 NHG Guarantee Matrix</a></li>
+            <li><a class="sub" href="#ch5-nibud">5.3 Nibud Debt Deductions</a></li>
+            <li><a class="sub" href="#ch5-dossier">5.4 Dossier &amp; State Gates</a></li>
+            <li><a class="sub" href="#ch5-offer">5.5 Offer &amp; Notary Rules</a></li>
+            <li><a class="sub" href="#ch5-calc">5.6 Amortization Formulas</a></li>
+          </ul>
+        </aside>
+
+        <!-- Document Content -->
+        <main class="doc-content">
+          <!-- Chapter 1 -->
+          <section id="ch1">
+            <h2 class="chapter-title">Chapter 1: Business Domain & Regulatory Framework</h2>
+            
+            <h3 class="section-title" id="ch1-market">1.1 Market Context & Intermediary Distribution</h3>
+            <p>The Dutch residential mortgage ecosystem relies heavily on third-party distribution: over <strong>75% of mortgages in the Netherlands</strong> are originated through independent certified intermediaries (<em>Hypotheekadviseurs</em>) rather than direct retail bank branches. Intermediaries evaluate multi-lender scenarios, compile verification dossiers, and submit structured loan applications to funding lenders (retail banks, pension funds, and insurance syndicates). The Akkuro Mortgage Platform serves as a multi-actor Loan Origination System (LOS) connecting Intermediaries, Lenders, Underwriters, and Civil-Law Notaries.</p>
+
+            <h3 class="section-title" id="ch1-reg">1.2 Statutory Supervisory Bodies (AFM, Nibud, NHG)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Statutory Body</th>
+                  <th>Mandate</th>
+                  <th>LOS Enforcement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>AFM</strong> (Financial Markets Authority)</td>
+                  <td>Conduct supervision, anti-predatory lending & Wft compliance.</td>
+                  <td>Enforces 14-day statutory reflection window post-binding offer.</td>
+                </tr>
+                <tr>
+                  <td><strong>Nibud</strong> (National Budget Institute)</td>
+                  <td>Debt-to-income financing burden tables & borrowing capacity.</td>
+                  <td>Calculates max borrowing limits factoring BKR (2%) and DUO debt.</td>
+                </tr>
+                <tr>
+                  <td><strong>NHG</strong> (National Mortgage Guarantee)</td>
+                  <td>Default risk safety net operated by Stichting WEW.</td>
+                  <td>Applies statutory cap (€435,000 in 2024/25) & 35 bps rate discount.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch1-personas">1.3 Stakeholder Personas & Value Proposition</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Persona</th>
+                  <th>Role</th>
+                  <th>Primary Workflow Need</th>
+                  <th>Pain Point Addressed</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Borrower</strong> (<em>Klant</em>)</td>
+                  <td>Consumer applying for financing</td>
+                  <td>Transparent status tracking, digital document upload, fast offer turnaround.</td>
+                  <td>Opaque underwriting stages and repetitive document requests.</td>
+                </tr>
+                <tr>
+                  <td><strong>Intermediary Advisor</strong> (<em>Hypotheekadviseur</em>)</td>
+                  <td>Certified mortgage broker</td>
+                  <td>Multi-scenario loan modeling, automated dossier validation, instant intake routing.</td>
+                  <td>Manual document verification and back-and-forth email loops with underwriters.</td>
+                </tr>
+                <tr>
+                  <td><strong>Lender Underwriter</strong> (<em>Acceptant</em>)</td>
+                  <td>Credit risk decision-maker</td>
+                  <td>Automated statutory compliance gating, auditable risk calculations, one-click offer generation.</td>
+                  <td>Re-keying data between disparate banking systems and manual LTV/NHG validation.</td>
+                </tr>
+                <tr>
+                  <td><strong>Civil-Law Notary</strong> (<em>Notaris</em>)</td>
+                  <td>Legal closing officer</td>
+                  <td>Tamper-proof deed instructions (<em>Passeeropdracht</em>), automated fund reconciliation.</td>
+                  <td>Delayed escrow disbursements and unverified last-minute contract amendments.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch1-glossary">1.4 Standardized Domain Glossary</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Dutch Term</th>
+                  <th>English Concept</th>
+                  <th>BA Significance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>Aanvraag</strong></td><td>Mortgage Application</td><td>Core case dossier containing borrower, property, and loan tranches.</td></tr>
+                <tr><td><strong>Taxatiewaarde</strong></td><td>Appraised Market Value</td><td>NWWI certified property value serving as LTV statutory denominator.</td></tr>
+                <tr><td><strong>Koopsom</strong></td><td>Purchase Price</td><td>Agreed purchase price from provisional purchase deed (<em>Koopovereenkomst</em>).</td></tr>
+                <tr><td><strong>LTV</strong></td><td>Loan-to-Value Ratio</td><td>Total loan as % of appraisal value (Cap: 100% standard, 106% with EBV).</td></tr>
+                <tr><td><strong>EBV</strong></td><td>Energy-Saving Budget</td><td>Up to 6% additional loan strictly dedicated to certified sustainable renovations.</td></tr>
+                <tr><td><strong>Borgtochtprovisie</strong></td><td>NHG Guarantee Fee</td><td>One-time statutory 0.6% fee paid by borrower at notary closing.</td></tr>
+                <tr><td><strong>Definitieve Offerte</strong></td><td>Binding Mortgage Offer</td><td>Legally binding contract issued post-underwriting; triggers 14-day window.</td></tr>
+                <tr><td><strong>Passeerdatum</strong></td><td>Closing / Execution Date</td><td>Scheduled date when notary executes mortgage deed & disburses funds.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Chapter 2 -->
+          <section id="ch2" style="margin-top: 40px;">
+            <h2 class="chapter-title">Chapter 2: Process Architecture & Workflow Modeling</h2>
+            <p>The Akkuro Platform enforces a strict 5-stage lifecycle with state-machine transition validation and Four-Eyes segregation of duties.</p>
+
+            <h3 class="section-title" id="ch2-sequence">2.1 End-to-End Sequence Flow</h3>
+            <p>The origination pipeline orchestrates five principal actors: Borrower, Intermediary Advisor, Akkuro Rule Engine, Lender Underwriter, and Civil-Law Notary across 7 discrete hand-off events:</p>
+            <pre>1. [Borrower] ───────► (Financials & Preferences) ────────► [Advisor]
+2. [Advisor] ────────► (Model Scenarios & Submit) ────────► [Akkuro Engine]   (DRAFT -> SUBMITTED)
+3. [Advisor] ────────► (Verify 4 Mandatory Docs) ─────────► [Akkuro Engine]   (DOCUMENT_VERIFICATION)
+4. [Advisor] ────────► (Promote Dossier) ─────────────────► [Underwriting]    (CREDIT_ASSESSMENT)
+5. [Underwriter] ────► (Approve Credit & Lock Rate) ──────► [Akkuro Engine]   (BINDING_OFFER_ISSUED)
+6. [Borrower] ───────► (Digital Signature ≤ 14 Days) ─────► [Akkuro Engine]   (ACCEPTED_BY_BORROWER)
+7. [Akkuro Engine] ──► (Passeeropdracht Closing Package) ─► [Civil Notary]    (NOTARY_PASSED -> Funds Disbursed)</pre>
+
+            <h3 class="section-title" id="ch2-bpmn">2.2 BPMN 2.0 5-Stage Origination Swimlanes</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Stage</th>
+                  <th>Phase Name</th>
+                  <th>Primary Actor</th>
+                  <th>Key Actions & Deliverables</th>
+                  <th>Automated System Gate</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Stage 1</strong></td>
+                  <td>Intake &amp; Scenario Modeling</td>
+                  <td>Borrower &amp; Advisor</td>
+                  <td>Collect income, debts (BKR/DUO), simulate Nibud capacity.</td>
+                  <td>Schema validation &amp; preliminary sanity checks (<code>BR-STATE-01</code>).</td>
+                </tr>
+                <tr>
+                  <td><strong>Stage 2</strong></td>
+                  <td>Dossier Intake &amp; Verification</td>
+                  <td>Mortgage Advisor</td>
+                  <td>Upload &amp; verify Employer slip, UWV record, NWWI appraisal, Purchase deed.</td>
+                  <td>Hard stop: All 4 documents must be verified (<code>BR-DOC-01</code>).</td>
+                </tr>
+                <tr>
+                  <td><strong>Stage 3</strong></td>
+                  <td>Credit Assessment &amp; Gating</td>
+                  <td>Lender Underwriter</td>
+                  <td>Four-Eyes risk audit: LTV check (100/106% EBV), NHG validation, capacity.</td>
+                  <td>Calculated LTV &lt;= cap &amp; loan &lt;= Nibud ceiling (<code>BR-STATE-03</code>).</td>
+                </tr>
+                <tr>
+                  <td><strong>Stage 4</strong></td>
+                  <td>Binding Offer &amp; Reflection</td>
+                  <td>Borrower &amp; Lender</td>
+                  <td>Issue immutable <em>Definitieve Offerte</em>; borrower reviews terms.</td>
+                  <td>14-day statutory reflection window countdown (<code>BR-OFFER-02</code>).</td>
+                </tr>
+                <tr>
+                  <td><strong>Stage 5</strong></td>
+                  <td>Notary Closing &amp; Settlement</td>
+                  <td>Civil-Law Notary</td>
+                  <td>Receive <em>Passeeropdracht</em>, draft deed, execute and release funds.</td>
+                  <td>Escrow trust balance matched against settlement statement (<code>BR-NOTARY-02</code>).</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch2-state">2.3 State Transition Matrix</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>From State</th>
+                  <th>To State</th>
+                  <th>Trigger Event</th>
+                  <th>Allowed Actor(s)</th>
+                  <th>Guard Condition</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>DRAFT</code></td><td><code>SUBMITTED</code></td><td>Submit Application</td><td>Borrower, Advisor</td><td>Mandatory schema check passed (<code>BR-STATE-01</code>)</td></tr>
+                <tr><td><code>SUBMITTED</code></td><td><code>DOCUMENT_VERIFICATION</code></td><td>Intake Routing</td><td>Advisor, System</td><td>Anti-fraud &amp; intake gate passed (<code>BR-STATE-01b</code>)</td></tr>
+                <tr><td><code>DOCUMENT_VERIFICATION</code></td><td><code>CREDIT_ASSESSMENT</code></td><td>Dossier Verified</td><td>Advisor</td><td>4 mandatory documents verified (<code>BR-DOC-01</code>, <code>BR-STATE-02</code>)</td></tr>
+                <tr><td><code>CREDIT_ASSESSMENT</code></td><td><code>BINDING_OFFER_ISSUED</code></td><td>Underwriting Approval</td><td>Underwriter</td><td>LTV &lt;= cap, loan &lt;= Nibud, NHG valid (<code>BR-STATE-03</code>)</td></tr>
+                <tr><td><code>CREDIT_ASSESSMENT</code></td><td><code>REJECTED</code></td><td>Underwriting Rejection</td><td>Underwriter</td><td>Statutory violation or risk threshold breached (<code>BR-LTV-02</code>, <code>BR-LTV-04</code>)</td></tr>
+                <tr><td><code>BINDING_OFFER_ISSUED</code></td><td><code>ACCEPTED_BY_BORROWER</code></td><td>Offer Acceptance</td><td>Borrower</td><td>Signed within 14-day statutory reflection window (<code>BR-STATE-04</code>)</td></tr>
+                <tr><td><code>BINDING_OFFER_ISSUED</code></td><td><code>EXPIRED</code></td><td>Reflection Timeout</td><td>System</td><td>Statutory 14-day window lapsed without signature (<code>BR-OFFER-02</code>)</td></tr>
+                <tr><td><code>ACCEPTED_BY_BORROWER</code></td><td><code>NOTARY_PASSED</code></td><td>Deed Execution</td><td>Notary</td><td>Deed executed &amp; escrow funds released (<code>BR-STATE-05</code>)</td></tr>
+                <tr><td><em>Any Pre-Closing State</em></td><td><code>CANCELLED</code></td><td>Withdrawal</td><td>Borrower, Advisor</td><td>Application formally withdrawn by customer prior to deed execution</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch2-rbac">2.4 Role-Based Access Control (RBAC)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Borrower (Klant)</th>
+                  <th>Advisor (Adviseur)</th>
+                  <th>Underwriter (Acceptant)</th>
+                  <th>Notary (Notaris)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Initiate Application</td><td>✅ Full</td><td>✅ Full</td><td>❌ None</td><td>❌ None</td></tr>
+                <tr><td>Verify Mandatory Dossier</td><td>⚠️ Upload only</td><td>✅ Verify &amp; Sign-off</td><td>👁️ Audit only</td><td>❌ None</td></tr>
+                <tr><td>Configure Loan Scenarios</td><td>👁️ View quote</td><td>✅ Configure &amp; Model</td><td>👁️ Review</td><td>❌ None</td></tr>
+                <tr><td>Issue Binding Offer</td><td>❌ Forbidden</td><td>❌ Forbidden</td><td>✅ Exclusive</td><td>❌ None</td></tr>
+                <tr><td>Execute Mortgage Deed</td><td>❌ Forbidden</td><td>❌ Forbidden</td><td>❌ Forbidden</td><td>✅ Exclusive</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Chapter 3 -->
+          <section id="ch3" style="margin-top: 40px;">
+            <h2 class="chapter-title">Chapter 3: Functional Requirements &amp; User Stories</h2>
+            <p>1-to-1 mapping across the 5 Process Stages with Given-When-Then BDD scenarios and explicit rule traceability tags (5 Flagship Stories).</p>
+
+            <!-- Epic 01 -->
+            <div id="epic1">
+              <h3 class="section-title">EPIC-01: Loan Scenario Modeling &amp; Application Intake (Stage 1)</h3>
+              <div class="user-story-card">
+                <h4 class="story-title">US-01: Statutory Borrowing Capacity &amp; Debt-Burden Gating <span class="badge rule">BR-NIBUD-01..04</span> <span class="badge rule">BR-CALC-01..02</span></h4>
+                <div class="user-story-narrative">
+                  <strong>As a</strong> Mortgage Advisor, <strong>I want to</strong> input client gross incomes, fixed rate period, and existing debt obligations (DUO student debt, BKR credit lines), <strong>so that</strong> the system computes statutory maximum borrowing capacity under AFM/Nibud rules and models repayment schedules.
+                </div>
+                <pre>Scenario: Compliant capacity calculation with debt deduction
+  Given an applicant with gross annual income of €65,000
+  And an outstanding DUO student loan with initial balance of €20,000 (SF35 modern system)
+  And an active BKR revolving credit facility limit of €2,000
+  And a mortgage interest rate of 4.0% with a 10-year fixed term
+  When the advisor calculates statutory borrowing capacity
+  Then the DUO debt deducts €0.35 per €100 from monthly borrowing capacity (€70.00/month) per BR-NIBUD-02
+  And the BKR facility deducts 2.0% of total credit limit from monthly budget (€40.00/month) per BR-NIBUD-03
+  And the system outputs the net maximum permissible mortgage amount compliant with AFM rules</pre>
+              </div>
+            </div>
+
+            <!-- Epic 02 -->
+            <div id="epic2" style="margin-top: 24px;">
+              <h3 class="section-title">EPIC-02: Dossier Intake &amp; Document Verification (Stage 2)</h3>
+              <div class="user-story-card">
+                <h4 class="story-title">US-02: Mandatory 4-Document Intake &amp; Income Verification Gate <span class="badge rule">BR-DOC-01</span> <span class="badge rule">BR-DOC-02</span> <span class="badge rule">BR-STATE-02</span></h4>
+                <div class="user-story-narrative">
+                  <strong>As an</strong> Underwriting Intake Engine / Verification Specialist, <strong>I want to</strong> validate that all 4 mandatory statutory documents (Employer Statement, UWV Record, NWWI Appraisal, Purchase Agreement) are verified without critical discrepancies, <strong>so that</strong> incomplete dossiers are strictly blocked from underwriting.
+                </div>
+                <pre>Scenario: Blocking incomplete dossier from advancing to underwriting
+  Given a mortgage application in "DOCUMENT_VERIFICATION" status
+  And Employer Statement, UWV Record, and Purchase Agreement are marked "VERIFIED"
+  But NWWI Appraisal Report is missing or in "PENDING_UPLOAD" status
+  When the advisor attempts to submit the dossier to Credit Assessment
+  Then the system blocks the transition with error "DOSSIER_INCOMPLETE: Appraisal Report missing" per BR-DOC-01
+  And the application state remains locked in "DOCUMENT_VERIFICATION"</pre>
+              </div>
+            </div>
+
+            <!-- Epic 03 -->
+            <div id="epic3" style="margin-top: 24px;">
+              <h3 class="section-title">EPIC-03: Credit Assessment &amp; Compliance Gating (Stage 3)</h3>
+              <div class="user-story-card">
+                <h4 class="story-title">US-03: Statutory LTV &amp; NHG Compliance Decision Gate <span class="badge rule">BR-LTV-01..04</span> <span class="badge rule">BR-NHG-01..04</span> <span class="badge rule">BR-STATE-03</span></h4>
+                <div class="user-story-narrative">
+                  <strong>As a</strong> Lender Underwriter, <strong>I want to</strong> validate requested loan amounts against statutory LTV ceilings (100% standard vs. 106% with Energy Budget) and NHG guarantee criteria, <strong>so that</strong> I can approve compliant files or log a formal statutory rejection.
+                </div>
+                <pre>Scenario: Compliant sustainable purchase with 106% LTV
+  Given a property with appraised market value of €400,000
+  And certified energy-saving measures (EBV) of €20,000
+  When applicant requests a total loan amount of €420,000 (LTV = 105.0%)
+  Then the underwriting engine marks LTV as compliant (&lt;= 106.0%) per BR-LTV-03
+  And automatically allocates €20,000 into a designated construction deposit (Bouwdepot)
+
+Scenario: Underwriter issues formal rejection on non-compliant loan
+  Given a requested loan amount of €450,000 exceeding statutory Nibud borrowing capacity
+  When the underwriter reviews the audit scorecard and triggers "Reject Application"
+  Then the application transitions to terminal state "REJECTED"</pre>
+              </div>
+            </div>
+
+            <!-- Epic 04 -->
+            <div id="epic4" style="margin-top: 24px;">
+              <h3 class="section-title">EPIC-04: Binding Offer Issuance &amp; Statutory Reflection (Stage 4)</h3>
+              <div class="user-story-card">
+                <h4 class="story-title">US-04: Immutable Binding Offer Issuance &amp; 14-Day Reflection Window <span class="badge rule">BR-OFFER-01</span> <span class="badge rule">BR-OFFER-02</span> <span class="badge rule">BR-STATE-04</span></h4>
+                <div class="user-story-narrative">
+                  <strong>As a</strong> Compliance Officer / Borrower, <strong>I want to</strong> generate an immutable binding mortgage contract (Definitieve Offerte) and enforce the statutory 14-calendar-day reflection period (Bedenktijd), <strong>so that</strong> the borrower can execute digital acceptance or allow the offer to expire without penalty.
+                </div>
+                <pre>Scenario: Borrower accepts binding offer within statutory window
+  Given a binding offer issued on Day 1 with a 14-calendar-day reflection timer per BR-OFFER-02
+  When the borrower electronically signs the acceptance on Day 7
+  Then the application status transitions to "ACCEPTED_BY_BORROWER" per BR-STATE-04
+  And the system initiates the civil-law notary closing package workflow
+
+Scenario: Statutory reflection window expires without signature
+  Given an active binding offer with Day 14 reflection window elapsed
+  When Day 15 arrives without borrower digital signature
+  Then the system automatically transitions the offer to "EXPIRED"</pre>
+              </div>
+            </div>
+
+            <!-- Epic 05 -->
+            <div id="epic5" style="margin-top: 24px;">
+              <h3 class="section-title">EPIC-05: Notary Closing Instructions &amp; Fund Settlement (Stage 5)</h3>
+              <div class="user-story-card">
+                <h4 class="story-title">US-05: Notary Closing Package (Passeeropdracht) &amp; Escrow Settlement <span class="badge rule">BR-NOTARY-01</span> <span class="badge rule">BR-NOTARY-02</span> <span class="badge rule">BR-STATE-05</span></h4>
+                <div class="user-story-narrative">
+                  <strong>As an</strong> Operations Specialist / Civil-Law Notary, <strong>I want to</strong> transmit structured closing instructions (Passeeropdracht) to the notary and reconcile escrow settlement statements (Afleveringsnota) upon deed execution, <strong>so that</strong> deed execution and fund disbursement are synchronized seamlessly.
+                </div>
+                <pre>Scenario: Automated notary instruction dispatch and escrow release
+  Given an application in "ACCEPTED_BY_BORROWER" status
+  When calendar reaches 10 business days prior to scheduled closing date (Passeerdatum)
+  Then engine transmits structured Passeeropdracht payload to the notary office per BR-NOTARY-01
+  And upon notary confirmation of deed execution (Hypotheekakte), escrow funds are disbursed
+  And application state transitions to "NOTARY_PASSED" (Lifecycle Complete) per BR-STATE-05</pre>
+              </div>
+            </div>
+          </section>
+
+          <!-- Chapter 4 -->
+          <section id="ch4" style="margin-top: 40px;">
+            <h2 class="chapter-title">Chapter 4: Data Architecture & Domain Model</h2>
+
+            <h3 class="section-title" id="ch4-erd">4.1 Conceptual Entity-Relationship Model (ERD)</h3>
+            <p>The domain model establishes 6 core business entities and their structural cardinalities:</p>
+            <pre>┌────────────────────────┐         1..2 ┌────────────────────────┐
+│  MORTGAGE_APPLICATION  │◄────────────►│        BORROWER        │
+│────────────────────────│              │────────────────────────│
+│ • application_id (PK)  │              │ • borrower_id (PK)     │
+│ • total_loan_amount    │              │ • bsn_tax_number (ENC) │
+│ • calculated_ltv       │              │ • gross_annual_income  │
+│ • status [State Machine│              │ • duo_student_debt     │
+└───────────┬────────────┘              └────────────────────────┘
+            │ 1
+            ├──────────────────────────┐ 1
+            ▼ 1                        ▼
+┌────────────────────────┐  ┌────────────────────────┐
+│        PROPERTY        │  │        DOSSIER         │
+│────────────────────────│  │────────────────────────│
+│ • property_id (PK)     │  │ • dossier_id (PK)      │
+│ • appraised_value      │  │ • verification_status  │
+│ • purchase_price       │  └───────────┬────────────┘
+│ • energy_saving_budget │              │ 1
+└────────────────────────┘              ▼ 4..N
+            │ 1             ┌────────────────────────┐
+            ▼ 1..N          │        DOCUMENT        │
+┌────────────────────────┐  │────────────────────────│
+│       LOAN_PART        │  │ • document_id (PK)     │
+│────────────────────────│  │ • doc_type [4 types]   │
+│ • loan_part_id (PK)    │  │ • verification_flag    │
+│ • repayment_type       │  │ • file_hash (SHA-256)  │
+│ • principal_amount     │  └────────────────────────┘
+│ • interest_rate        │
+└────────────────────────┘</pre>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Relationship</th>
+                  <th>Source Entity</th>
+                  <th>Target Entity</th>
+                  <th>Cardinality</th>
+                  <th>Business Rule & Dependency</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Co-Borrowing</td>
+                  <td><code>MortgageApplication</code></td>
+                  <td><code>Borrower</code></td>
+                  <td>1 to 1..2</td>
+                  <td>Single applicant or dual co-signers (partner income aggregation).</td>
+                </tr>
+                <tr>
+                  <td>Collateralization</td>
+                  <td><code>MortgageApplication</code></td>
+                  <td><code>Property</code></td>
+                  <td>1 to 1</td>
+                  <td>Real estate asset appraised by NWWI; defines LTV denominator.</td>
+                </tr>
+                <tr>
+                  <td>Tranche Splitting</td>
+                  <td><code>MortgageApplication</code></td>
+                  <td><code>LoanPart</code></td>
+                  <td>1 to 1..N</td>
+                  <td>Permits split repayments (e.g. 50% Annuity + 50% Linear or Interest-Only).</td>
+                </tr>
+                <tr>
+                  <td>Dossier Verification</td>
+                  <td><code>MortgageApplication</code></td>
+                  <td><code>Dossier</code></td>
+                  <td>1 to 1</td>
+                  <td>Verification container gating promotion from Stage 2 to Stage 3.</td>
+                </tr>
+                <tr>
+                  <td>Document Audit</td>
+                  <td><code>Dossier</code></td>
+                  <td><code>Document</code></td>
+                  <td>1 to 4..N</td>
+                  <td>Requires minimum 4 statutory files (Employer, UWV, NWWI, Purchase).</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch4-dictionary">4.2 Standardized Data Dictionary (6 Core Entities)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Entity</th>
+                  <th>Key Fields</th>
+                  <th>Constraints &amp; Data Types</th>
+                  <th>Statutory / Business Rule</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>MortgageApplication</code></td><td><code>application_id, status, total_loan_amount, calculated_ltv_percent</code></td><td>UUID, Enum, Decimal(12,2)</td><td>Enforces 5-stage state machine transitions.</td></tr>
+                <tr><td><code>Borrower</code></td><td><code>borrower_id, bsn_tax_number, gross_annual_income, duo_student_debt</code></td><td>Encrypted BSN, Decimal(12,2)</td><td>Used for Nibud capacity &amp; BKR credit checks.</td></tr>
+                <tr><td><code>Property</code></td><td><code>property_id, purchase_price, appraised_market_value, energy_saving_budget</code></td><td>Decimal(12,2), String energy label</td><td>Appraised value serves as statutory LTV denominator.</td></tr>
+                <tr><td><code>LoanPart</code></td><td><code>loan_part_id, repayment_type, principal_amount, interest_rate_percent</code></td><td>Enum (Annuity, Linear, Interest-Only)</td><td>Interest-Only capped at max 50% LTV.</td></tr>
+                <tr><td><code>Dossier</code></td><td><code>dossier_id, verification_status, fully_verified_at</code></td><td>Enum (PENDING, INCOMPLETE, VERIFIED)</td><td>Requires 4 mandatory documents verified.</td></tr>
+                <tr><td><code>Document</code></td><td><code>document_id, doc_type, verification_flag, file_hash</code></td><td>SHA-256 hash, Enum</td><td>Immutable audit trail for UWV &amp; NWWI appraisal.</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Chapter 5 -->
+          <section id="ch5" style="margin-top: 40px;">
+            <h2 class="chapter-title">Chapter 5: Business Rules & Financial Calculation Matrix</h2>
+            
+            <h3 class="section-title" id="ch5-ltv">5.1 Statutory Loan-to-Value (LTV) Rules</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>EBV Included?</th>
+                  <th>Max LTV Cap</th>
+                  <th>Verification Condition</th>
+                  <th>System Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>BR-LTV-01</code></td><td>No</td><td><strong>100.0%</strong></td><td>Requested Loan &lt;= Appraised Value</td><td>Status = COMPLIANT. Underwriting proceeds.</td></tr>
+                <tr><td><code>BR-LTV-02</code></td><td>No</td><td><strong>100.0%</strong></td><td>Requested Loan &gt; Appraised Value</td><td>Status = REJECTED. LTV hard stop.</td></tr>
+                <tr><td><code>BR-LTV-03</code></td><td>Yes</td><td><strong>106.0%</strong></td><td>EBV &lt;= 6% of Appraised Value</td><td>Status = COMPLIANT. Funds held in Bouwdepot.</td></tr>
+                <tr><td><code>BR-LTV-04</code></td><td>Yes</td><td><strong>106.0%</strong></td><td>Total Loan &gt; 106.0%</td><td>Status = REJECTED. EBV ceiling exceeded.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch5-nhg">5.2 National Mortgage Guarantee (NHG) Decision Matrix</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Purchase Value</th>
+                  <th>Energy Savings?</th>
+                  <th>Eligibility</th>
+                  <th>Guarantee Fee (0.6%)</th>
+                  <th>Interest Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>BR-NHG-01</code></td><td>&lt;= €435,000</td><td>No</td><td><strong>Eligible</strong></td><td>0.6% of loan principal</td><td>-0.35% discount</td></tr>
+                <tr><td><code>BR-NHG-02</code></td><td>&gt; €435,000</td><td>No</td><td><strong>Ineligible</strong></td><td>None</td><td>Standard rate</td></tr>
+                <tr><td><code>BR-NHG-03</code></td><td>&lt;= €461,100</td><td>Yes (EBV)</td><td><strong>Eligible</strong></td><td>0.6% of loan principal</td><td>-0.35% discount</td></tr>
+                <tr><td><code>BR-NHG-04</code></td><td>&gt; €461,100</td><td>Yes</td><td><strong>Ineligible</strong></td><td>None</td><td>Standard rate</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch5-nibud">5.3 Nibud Borrowing Capacity & Debt Deduction Rules</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Debt / Facility Type</th>
+                  <th>Registry</th>
+                  <th>Statutory Ratio</th>
+                  <th>Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>BR-NIBUD-01</code></td><td>Base Capacity Factor</td><td>Nibud</td><td><strong>Income &amp; Rate Tier</strong></td><td>Determines maximum base borrowing capacity prior to debt factoring.</td></tr>
+                <tr><td><code>BR-NIBUD-02</code></td><td>Revolving Credit / Card</td><td>BKR</td><td><strong>2.0%</strong> of limit / month</td><td>Deducted directly from monthly disposable budget.</td></tr>
+                <tr><td><code>BR-NIBUD-03</code></td><td>Student Debt (Pre-2015 SF15)</td><td>DUO</td><td><strong>0.75%</strong> of loan / month</td><td>15-year repayment horizon reduction.</td></tr>
+                <tr><td><code>BR-NIBUD-04</code></td><td>Student Debt (Post-2015 SF35)</td><td>DUO</td><td><strong>0.35%</strong> of loan / month</td><td>35-year repayment horizon reduction.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch5-dossier">5.4 Dossier Verification &amp; Lifecycle Gates</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Process Gate</th>
+                  <th>Condition</th>
+                  <th>System Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>BR-DOC-01</code></td><td>Stage 2 Verification Gate</td><td>All 4 mandatory documents marked VERIFIED</td><td>Allow transition to <code>CREDIT_ASSESSMENT</code>. Incomplete dossiers blocked.</td></tr>
+                <tr><td><code>BR-DOC-02</code></td><td>Income Variance Reconciliation</td><td>UWV vs self-reported salary variance &gt; 5.0%</td><td>Flag CRITICAL_DISCREPANCY. Require Employer Explanation Letter.</td></tr>
+                <tr><td><code>BR-STATE-01</code></td><td>Intake Submission Gate</td><td>Mandatory applicant, property, income fields present</td><td>Allow transition <code>DRAFT</code> &rarr; <code>SUBMITTED</code>.</td></tr>
+                <tr><td><code>BR-STATE-03</code></td><td>Credit Decision Gate</td><td>LTV compliant &amp; Loan &lt;= Nibud &amp; NHG valid</td><td>Allow transition <code>CREDIT_ASSESSMENT</code> &rarr; <code>BINDING_OFFER_ISSUED</code>.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch5-offer">5.5 Binding Offer &amp; Notary Settlement Rules</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule ID</th>
+                  <th>Regulatory Body</th>
+                  <th>Statutory Mandate</th>
+                  <th>System Enforcement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><code>BR-OFFER-01</code></td><td>AFM / Wft</td><td>Binding Offer Immutability</td><td>Lock interest rate, loan terms, and cryptographic hash in audit ledger.</td></tr>
+                <tr><td><code>BR-OFFER-02</code></td><td>MCD / AFM</td><td>14-Day Reflection Period (Bedenktijd)</td><td>Timer starts upon offer issuance. Auto-transition to <code>EXPIRED</code> if unexecuted on Day 15.</td></tr>
+                <tr><td><code>BR-NOTARY-01</code></td><td>KNB / Civil Law</td><td>Passeeropdracht Dispatch</td><td>Transmit closing package to notary 10 business days prior to closing date.</td></tr>
+                <tr><td><code>BR-NOTARY-02</code></td><td>Bank Treasury</td><td>Escrow Reconciliation (Afleveringsnota)</td><td>Verify final settlement statement matches approved principal before fund disbursement.</td></tr>
+              </tbody>
+            </table>
+
+            <h3 class="section-title" id="ch5-calc">5.6 Repayment Amortization Formulas</h3>
+            <p><strong>Annuity (<code>BR-CALC-01</code>):</strong> Fixed gross installment $M = P \cdot \frac{r(1+r)^n}{(1+r)^n - 1}$. Principal share increases monotonically while interest share decreases.<br>
+            <strong>Linear (<code>BR-CALC-02</code>):</strong> Constant principal repayment $C = P / 360$. Total installment strictly decreases every month, resulting in lowest lifetime total interest.</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- Tab 2: Interactive Rule Simulator -->
+    <div id="sim-tab" class="tab-content">
+      <div class="badge-bar">
+        <span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.35);">🔍 Public Regulatory Formulas</span>
+        <span class="badge">Live Calculation Engine</span>
+        <span class="badge green">Zero Dependencies</span>
+        <span class="badge">Pure JavaScript Reference</span>
+      </div>
+
+      <div class="sim-grid">
+        <!-- Input Card -->
+        <div class="card">
+          <h2 class="card-title">1. Scenario Parameters</h2>
+          <div class="form-group">
+            <label>Appraised Property Value (Taxatiewaarde - €)</label>
+            <input type="number" id="appraisedValue" value="400000" step="5000">
+          </div>
+          <div class="form-group">
+            <label>Requested Mortgage Principal (€)</label>
+            <input type="number" id="requestedPrincipal" value="400000" step="5000">
+          </div>
+          <div class="form-group">
+            <label>Annual Interest Rate (%)</label>
+            <input type="number" id="interestRate" value="4.00" step="0.05">
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="ebvBudget">
+            <label for="ebvBudget">Include Certified Energy-Saving Budget (EBV - up to 106% LTV)</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="requestNhg" checked>
+            <label for="requestNhg">Request NHG Guarantee (Max €435k cap)</label>
+          </div>
+
+          <div class="rule-box">
+            <strong>BA Rule Traceability:</strong>
+            <br>• <code>BR-LTV-01/03</code>: Max 100% LTV (Standard) or 106% (EBV).
+            <br>• <code>BR-NHG-01</code>: 2024/2025 NHG cap is €435,000 (0.6% fee, -0.35% rate discount).
+          </div>
+        </div>
+
+        <!-- Result Card -->
+        <div class="card">
+          <h2 class="card-title">2. Underwriting Gating Engine</h2>
+          <div class="result-row">
+            <span class="result-label">Calculated LTV:</span>
+            <span class="result-value" id="ltvValue">100.00%</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">LTV Statutory Gate:</span>
+            <span id="ltvStatus" class="status-pill pass">PASS</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">NHG Qualification:</span>
+            <span id="nhgStatus" class="status-pill pass">ELIGIBLE</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">NHG Guarantee Fee (0.6%):</span>
+            <span class="result-value" id="nhgFeeValue">€2,400</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Effective Interest Rate:</span>
+            <span class="result-value" id="effectiveRateValue">3.65% (-0.35% NHG)</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">Lifecycle Action:</span>
+            <span class="result-value" id="underwritingAction" style="color: #60a5fa;">Ready for Binding Offer</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Amortization Card -->
+      <div class="card" style="margin-top: 24px;">
+        <h2 class="card-title">3. Repayment Comparison: Annuity vs. Linear (30 Years / 360 Months)</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Amortization Model</th>
+              <th>Month 1 Gross</th>
+              <th>Month 120 Gross</th>
+              <th>Month 360 Gross</th>
+              <th>Lifetime Total Interest</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="color: #fff; font-weight: 600;">Annuity (Annuïteit)</td>
+              <td id="annuityM1" style="font-family: var(--font-mono);">-</td>
+              <td id="annuityM120" style="font-family: var(--font-mono);">-</td>
+              <td id="annuityM360" style="font-family: var(--font-mono);">-</td>
+              <td id="annuityTotalInterest" style="font-family: var(--font-mono); color: #93c5fd;">-</td>
+            </tr>
+            <tr>
+              <td style="color: #fff; font-weight: 600;">Linear (Lineair)</td>
+              <td id="linearM1" style="font-family: var(--font-mono);">-</td>
+              <td id="linearM120" style="font-family: var(--font-mono);">-</td>
+              <td id="linearM360" style="font-family: var(--font-mono);">-</td>
+              <td id="linearTotalInterest" style="font-family: var(--font-mono); color: #34d399;">-</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    function calculate() {
+      const appraised = parseFloat(document.getElementById('appraisedValue').value) || 0;
+      const principal = parseFloat(document.getElementById('requestedPrincipal').value) || 0;
+      const baseRate = parseFloat(document.getElementById('interestRate').value) || 0;
+      const hasEbv = document.getElementById('ebvBudget').checked;
+      const wantsNhg = document.getElementById('requestNhg').checked;
+
+      if (appraised <= 0 || principal <= 0) return;
+
+      const ltv = (principal / appraised) * 100;
+      const maxLtv = hasEbv ? 106.0 : 100.0;
+      document.getElementById('ltvValue').textContent = ltv.toFixed(2) + '% (Cap: ' + maxLtv + '%)';
+
+      const ltvStatusEl = document.getElementById('ltvStatus');
+      const isLtvPass = ltv <= maxLtv;
+      if (isLtvPass) {
+        ltvStatusEl.className = 'status-pill pass';
+        ltvStatusEl.textContent = 'PASS';
+      } else {
+        ltvStatusEl.className = 'status-pill fail';
+        ltvStatusEl.textContent = 'VIOLATION (> ' + maxLtv + '%)';
+      }
+
+      const nhgCap = hasEbv ? 461100 : 435000;
+      const isNhgEligible = wantsNhg && principal <= nhgCap;
+      const nhgStatusEl = document.getElementById('nhgStatus');
+
+      let effectiveRate = baseRate;
+      let nhgFee = 0;
+
+      if (wantsNhg) {
+        if (isNhgEligible) {
+          nhgStatusEl.className = 'status-pill pass';
+          nhgStatusEl.textContent = 'ELIGIBLE';
+          effectiveRate = Math.max(0, baseRate - 0.35);
+          nhgFee = principal * 0.006;
+          document.getElementById('nhgFeeValue').textContent = '€' + Math.round(nhgFee).toLocaleString();
+          document.getElementById('effectiveRateValue').textContent = effectiveRate.toFixed(2) + '% (-0.35% NHG)';
+        } else {
+          nhgStatusEl.className = 'status-pill fail';
+          nhgStatusEl.textContent = 'CAP EXCEEDED (> €' + nhgCap.toLocaleString() + ')';
+          document.getElementById('nhgFeeValue').textContent = 'N/A';
+          document.getElementById('effectiveRateValue').textContent = baseRate.toFixed(2) + '% (Standard)';
+        }
+      } else {
+        nhgStatusEl.className = 'status-pill';
+        nhgStatusEl.style.background = '#1e293b';
+        nhgStatusEl.style.color = '#94a3b8';
+        nhgStatusEl.textContent = 'NOT REQUESTED';
+        document.getElementById('nhgFeeValue').textContent = '€0';
+        document.getElementById('effectiveRateValue').textContent = baseRate.toFixed(2) + '% (Standard)';
+      }
+
+      const actionEl = document.getElementById('underwritingAction');
+      if (!isLtvPass) {
+        actionEl.textContent = 'REJECT: LTV Statutory Violation';
+        actionEl.style.color = '#f87171';
+      } else {
+        actionEl.textContent = 'PASS: Issue Binding Offer';
+        actionEl.style.color = '#34d399';
+      }
+
+      const n = 360;
+      const r = (effectiveRate / 100) / 12;
+
+      const annuityPayment = principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      const annuityTotalInterest = (annuityPayment * n) - principal;
+
+      document.getElementById('annuityM1').textContent = '€' + Math.round(annuityPayment).toLocaleString();
+      document.getElementById('annuityM120').textContent = '€' + Math.round(annuityPayment).toLocaleString();
+      document.getElementById('annuityM360').textContent = '€' + Math.round(annuityPayment).toLocaleString();
+      document.getElementById('annuityTotalInterest').textContent = '€' + Math.round(annuityTotalInterest).toLocaleString();
+
+      const linearPrincipalPerMonth = principal / n;
+      const linearM1 = linearPrincipalPerMonth + (principal * r);
+      const balance120 = principal - (linearPrincipalPerMonth * 119);
+      const linearM120 = linearPrincipalPerMonth + (balance120 * r);
+      const balance360 = linearPrincipalPerMonth;
+      const linearM360 = linearPrincipalPerMonth + (balance360 * r);
+      const linearTotalInterest = (n * (linearM1 + linearM360) / 2) - principal;
+
+      document.getElementById('linearM1').textContent = '€' + Math.round(linearM1).toLocaleString();
+      document.getElementById('linearM120').textContent = '€' + Math.round(linearM120).toLocaleString();
+      document.getElementById('linearM360').textContent = '€' + Math.round(linearM360).toLocaleString();
+      document.getElementById('linearTotalInterest').textContent = '€' + Math.round(linearTotalInterest).toLocaleString();
+    }
+
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('input', calculate);
+      input.addEventListener('change', calculate);
+    });
+
+    calculate();
+
+    // --- TOC Active State & ScrollSpy ---
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    const tocTargets = [];
+
+    tocLinks.forEach(link => {
+      const hash = link.getAttribute('href');
+      if (hash && hash.startsWith('#')) {
+        const target = document.getElementById(hash.substring(1));
+        if (target) {
+          tocTargets.push({ link, target });
+        }
+      }
+    });
+
+    function setActiveToc(linkToActivate) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      if (linkToActivate) {
+        linkToActivate.classList.add('active');
+        const sidebar = document.querySelector('.toc-sidebar');
+        if (sidebar) {
+          const linkTop = linkToActivate.offsetTop;
+          const sidebarScroll = sidebar.scrollTop;
+          const sidebarHeight = sidebar.clientHeight;
+          if (linkTop < sidebarScroll || linkTop > sidebarScroll + sidebarHeight - 40) {
+            sidebar.scrollTo({ top: linkTop - 40, behavior: 'smooth' });
+          }
+        }
+      }
+    }
+
+    // Click handler for left panel items
+    tocLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        setActiveToc(link);
+      });
+    });
+
+    // ScrollSpy handler for in-viewing section detection
+    let isScrollTicking = false;
+    function updateScrollSpy() {
+      if (!document.getElementById('fsd-tab').classList.contains('active')) return;
+      const headerOffset = 140;
+      let activeItem = tocTargets[0];
+
+      for (let i = 0; i < tocTargets.length; i++) {
+        const rect = tocTargets[i].target.getBoundingClientRect();
+        if (rect.top <= headerOffset) {
+          activeItem = tocTargets[i];
+        }
+      }
+
+      if (activeItem) {
+        setActiveToc(activeItem.link);
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!isScrollTicking) {
+        window.requestAnimationFrame(() => {
+          updateScrollSpy();
+          isScrollTicking = false;
+        });
+        isScrollTicking = true;
+      }
+    }, { passive: true });
+
+    // Initial activation on page load
+    if (tocTargets.length > 0) {
+      updateScrollSpy();
+    }
+  </script>
+</body>
+</html>
